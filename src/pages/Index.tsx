@@ -1,10 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { VoiceCompanion } from "@/components/VoiceCompanion";
 import { MemoryChat } from "@/components/MemoryChat";
-import { JournalEntry } from "@/components/JournalEntry";
-import { MoodTracker } from "@/components/MoodTracker";
 import { ApiKeyInput } from "@/components/ApiKeyInput";
+import { toast } from "@/components/ui/sonner";
 
 interface ApiKeys {
   openai: string;
@@ -22,7 +22,17 @@ const Index = () => {
     try {
       const savedKeys = localStorage.getItem("mindBFF_api_keys");
       if (savedKeys) {
-        setApiKeys(JSON.parse(savedKeys));
+        const keys = JSON.parse(savedKeys);
+        setApiKeys(keys);
+        if (!keys.elevenlabs) {
+          toast.warning("ElevenLabs API key not found. Voice features will be limited.", {
+            duration: 5000,
+          });
+        }
+      } else {
+        toast.info("Set up your API keys to unlock all features", {
+          duration: 5000,
+        });
       }
     } catch (error) {
       console.error("Error loading API keys:", error);
@@ -33,6 +43,7 @@ const Index = () => {
   const handleSaveKeys = (keys: ApiKeys) => {
     setApiKeys(keys);
     localStorage.setItem("mindBFF_api_keys", JSON.stringify(keys));
+    toast.success("API keys saved successfully");
   };
 
   // A quirky, randomly selected positive affirmation that changes daily

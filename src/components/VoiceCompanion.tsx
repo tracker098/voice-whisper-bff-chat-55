@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Mic, MicOff } from 'lucide-react';
 import { useConversation } from '@11labs/react';
 import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 
 interface VoiceCompanionProps {
   apiKey: string;
@@ -21,24 +22,18 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
   const [isListening, setIsListening] = useState(false);
   const [lastMessage, setLastMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
+  const { toast: toastHook } = useToast();
   
   const conversation = useConversation({
     onConnect: () => {
       console.log("Connected to voice agent");
       setError(null);
-      toast({
-        title: "Connected",
-        description: "Voice companion is now active",
-      });
+      toast.success("Voice companion is now active");
     },
     onDisconnect: () => {
       console.log("Disconnected from voice agent");
       setIsListening(false);
-      toast({
-        title: "Disconnected",
-        description: "Voice companion session ended",
-      });
+      toast.info("Voice companion session ended");
     },
     onMessage: (message: ElevenLabsMessage) => {
       console.log("Received message:", message);
@@ -50,6 +45,7 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
         } else if ('transcript' in message) {
           // Handle transcript messages (what the user said)
           console.log("User transcript:", message.transcript);
+          toast.info(`You said: ${message.transcript}`);
         }
       }
     },
@@ -57,11 +53,7 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
       console.error("Voice agent error:", err);
       setError("An error occurred connecting to the voice agent");
       setIsListening(false);
-      toast({
-        variant: "destructive",
-        title: "Connection Error",
-        description: "Could not connect to voice service",
-      });
+      toast.error("Could not connect to voice service");
     }
   });
 
@@ -78,11 +70,7 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
     try {
       if (!apiKey) {
         setError("Please set your ElevenLabs Secret Key in settings");
-        toast({
-          variant: "destructive",
-          title: "Missing Secret Key",
-          description: "ElevenLabs Secret Key is required for voice features",
-        });
+        toast.error("ElevenLabs Secret Key is required for voice features");
         return;
       }
 
@@ -93,13 +81,13 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
         console.log("Starting conversation with ElevenLabs", apiKey);
         
         // Initialize session with the correct agent ID and authentication
-        // For ElevenLabs, we use the secret key directly without Bearer prefix
         await conversation.startSession({ 
           agentId: "IpGxDXMq7Zdd28TdsFMg", // Mental Health BFF agent ID
           authorization: apiKey, // Use the secret key directly without Bearer prefix
         });
         
         setIsListening(true);
+        toast.success("Listening to your voice...");
       } else {
         console.log("Ending conversation");
         await conversation.endSession();
@@ -110,18 +98,10 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
       
       if (err instanceof Error) {
         setError(`Error: ${err.message}`);
-        toast({
-          variant: "destructive",
-          title: "Connection Error",
-          description: err.message,
-        });
+        toast.error(err.message);
       } else {
         setError("Please allow microphone access to use the voice companion");
-        toast({
-          variant: "destructive",
-          title: "Microphone Access",
-          description: "Please allow microphone access to use voice features",
-        });
+        toast.error("Please allow microphone access to use voice features");
       }
     }
   };
