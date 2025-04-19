@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff } from 'lucide-react';
 import { useConversation } from '@11labs/react';
+import { useToast } from '@/hooks/use-toast';
 
 interface VoiceCompanionProps {
   apiKey: string;
@@ -12,57 +13,111 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
   const [isListening, setIsListening] = useState(false);
   const [lastMessage, setLastMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
-  
-  // Note: In a production app, you would want to securely store/retrieve this key
-  // For demo purposes, we're passing it as a prop
+  const { toast } = useToast();
   
   const conversation = useConversation({
     onConnect: () => {
       console.log("Connected to voice agent");
       setError(null);
+      toast({
+        title: "Connected",
+        description: "Voice companion is now active",
+      });
     },
     onDisconnect: () => {
       console.log("Disconnected from voice agent");
       setIsListening(false);
+      toast({
+        title: "Disconnected",
+        description: "Voice companion session ended",
+      });
     },
     onMessage: (message) => {
-      // The message structure depends on the specific implementation
-      // Adjust according to actual message structure
-      if (message && typeof message === 'object' && 'message' in message) {
-        setLastMessage(message.message);
+      console.log("Received message:", message);
+      if (message && typeof message === 'object') {
+        if ('message' in message) {
+          setLastMessage(message.message as string);
+        } else if ('text' in message) {
+          setLastMessage(message.text as string);
+        } else if ('transcript' in message) {
+          // Handle transcript messages (what the user said)
+          console.log("User transcript:", message.transcript);
+        }
       }
     },
     onError: (err) => {
       console.error("Voice agent error:", err);
       setError("An error occurred connecting to the voice agent");
       setIsListening(false);
+      toast({
+        variant: "destructive",
+        title: "Connection Error",
+        description: "Could not connect to voice service",
+      });
     }
   });
 
   const { status, isSpeaking } = conversation;
 
+  useEffect(() => {
+    // If API key changes and we're listening, restart the session
+    if (apiKey && isListening) {
+      handleToggleListening();
+    }
+  }, [apiKey]);
+
   const handleToggleListening = async () => {
     try {
+      if (!apiKey) {
+        setError("Please set your ElevenLabs API key in settings");
+        toast({
+          variant: "destructive",
+          title: "Missing API Key",
+          description: "ElevenLabs API key is required for voice features",
+        });
+        return;
+      }
+
       if (!isListening) {
         // Request microphone access
         await navigator.mediaDevices.getUserMedia({ audio: true });
         
-        // Start conversation with ElevenLabs
-        // Note: This is a simplified example, actual implementation might differ
+        console.log("Starting conversation with ElevenLabs");
+        
+        // Initialize session with key from props
         await conversation.startSession({ 
-          agentId: "default" // Replace with your actual agent ID
-          // Use origin instead of direct URL for ElevenLabs API
-          // The API key would be handled through authorization parameter or server-side
+          agentId: "default",
+          apiKey: apiKey,
+          connectionConfig: {
+            // To avoid CORS issues, use ElevenLabs API directly
+            wsUrl: "wss://api.elevenlabs.io/v1/convai/websocket",
+          }
         });
         
         setIsListening(true);
       } else {
+        console.log("Ending conversation");
         await conversation.endSession();
         setIsListening(false);
       }
     } catch (err) {
-      console.error("Microphone access error:", err);
-      setError("Please allow microphone access to use the voice companion");
+      console.error("Microphone/connection error:", err);
+      
+      if (err instanceof Error) {
+        setError(`Error: ${err.message}`);
+        toast({
+          variant: "destructive",
+          title: "Connection Error",
+          description: err.message,
+        });
+      } else {
+        setError("Please allow microphone access to use the voice companion");
+        toast({
+          variant: "destructive",
+          title: "Microphone Access",
+          description: "Please allow microphone access to use voice features",
+        });
+      }
     }
   };
 
@@ -104,6 +159,9 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
                 : "I'm listening...") 
               : "Tap to start talking"
             }
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {status === "connected" ? "Connected" : "Disconnected"}
           </p>
         </div>
       </div>
