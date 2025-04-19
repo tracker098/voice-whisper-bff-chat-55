@@ -74,7 +74,7 @@ export function ApiKeyInput({ onSaveKeys, initialKeys }: ApiKeyInputProps) {
           </div>
           <div className="space-y-2">
             <label htmlFor="elevenlabs-key" className="text-sm font-medium">
-              ElevenLabs API Key
+              ElevenLabs Secret Key
             </label>
             <Input
               id="elevenlabs-key"

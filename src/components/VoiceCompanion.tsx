@@ -94,9 +94,8 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
         
         // Initialize session with the correct agent ID and authentication
         await conversation.startSession({ 
-          agentId: "IpGxDXMq7Zdd28TdsFMg", // Use the provided agent ID
-          authorization: `Bearer ${apiKey}`, // Use authorization instead of apiKey
-          wsUrl: "wss://api.elevenlabs.io/v1/convai/websocket", // Direct WebSocket URL
+          agentId: "IpGxDXMq7Zdd28TdsFMg", // Mental Health BFF agent ID
+          authorization: `Bearer ${apiKey}`, // Use the API key as a Bearer token
         });
         
         setIsListening(true);
@@ -150,7 +149,7 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
             onClick={handleToggleListening}
             variant="ghost"
             size="icon"
-            className={`w-24 h-24 rounded-full ${isListening ? 'bg-mentalPurple-500 text-white hover:bg-mentalPurple-600' : 'bg-white text-mentalPurple-500 hover:bg-gray-100'}`}
+            className={`w-24 h-24 rounded-full cursor-pointer ${isListening ? 'bg-mentalPurple-500 text-white hover:bg-mentalPurple-600' : 'bg-white text-mentalPurple-500 hover:bg-gray-100'}`}
           >
             {isListening ? <MicOff className="h-10 w-10" /> : <Mic className="h-10 w-10" />}
           </Button>
