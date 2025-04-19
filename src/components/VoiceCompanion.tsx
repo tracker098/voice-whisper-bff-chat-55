@@ -9,6 +9,14 @@ interface VoiceCompanionProps {
   apiKey: string;
 }
 
+// Define proper message type
+type ElevenLabsMessage = {
+  message?: string;
+  text?: string;
+  transcript?: string;
+  [key: string]: any; // Allow other properties
+}
+
 export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
   const [isListening, setIsListening] = useState(false);
   const [lastMessage, setLastMessage] = useState("");
@@ -32,7 +40,7 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
         description: "Voice companion session ended",
       });
     },
-    onMessage: (message) => {
+    onMessage: (message: ElevenLabsMessage) => {
       console.log("Received message:", message);
       if (message && typeof message === 'object') {
         if ('message' in message) {
@@ -84,10 +92,10 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
         
         console.log("Starting conversation with ElevenLabs");
         
-        // Initialize session with key from props
+        // Initialize session with key using authorization instead of apiKey
         await conversation.startSession({ 
           agentId: "default",
-          apiKey: apiKey,
+          authorization: `Bearer ${apiKey}`, // Use authorization instead of apiKey
           connectionConfig: {
             // To avoid CORS issues, use ElevenLabs API directly
             wsUrl: "wss://api.elevenlabs.io/v1/convai/websocket",
