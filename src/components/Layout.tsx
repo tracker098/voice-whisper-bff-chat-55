@@ -1,15 +1,33 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Activity, Brain, Calendar, MessageCircle } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
-  const [activeTab, setActiveTab] = useState<string>("talk");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const getActiveTab = () => {
+    switch (currentPath) {
+      case "/journal":
+        return "journal";
+      case "/mood":
+        return "mood";
+      case "/progress":
+        return "progress";
+      default:
+        return "talk";
+    }
+  };
+
+  const activeTab = getActiveTab();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-mentalPurple-50 to-mentalBlue-50">
@@ -34,25 +52,25 @@ export function Layout({ children }: LayoutProps) {
               icon={<MessageCircle />}
               label="Talk"
               active={activeTab === "talk"}
-              onClick={() => setActiveTab("talk")}
+              onClick={() => navigate("/")}
             />
             <NavButton
               icon={<Brain />}
               label="Journal"
               active={activeTab === "journal"}
-              onClick={() => setActiveTab("journal")}
+              onClick={() => navigate("/journal")}
             />
             <NavButton
               icon={<Activity />}
               label="Mood"
               active={activeTab === "mood"}
-              onClick={() => setActiveTab("mood")}
+              onClick={() => navigate("/mood")}
             />
             <NavButton
               icon={<Calendar />}
               label="Progress"
               active={activeTab === "progress"}
-              onClick={() => setActiveTab("progress")}
+              onClick={() => navigate("/progress")}
             />
           </div>
         </nav>

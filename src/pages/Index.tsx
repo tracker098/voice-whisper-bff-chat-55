@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { VoiceCompanion } from "@/components/VoiceCompanion";
@@ -6,8 +5,6 @@ import { MemoryChat } from "@/components/MemoryChat";
 import { JournalEntry } from "@/components/JournalEntry";
 import { MoodTracker } from "@/components/MoodTracker";
 import { ApiKeyInput } from "@/components/ApiKeyInput";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Brain, Activity, Calendar } from "lucide-react";
 
 interface ApiKeys {
   openai: string;
@@ -15,7 +12,6 @@ interface ApiKeys {
 }
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("talk");
   const [apiKeys, setApiKeys] = useState<ApiKeys>({
     openai: "",
     elevenlabs: ""
@@ -81,57 +77,10 @@ const Index = () => {
         </p>
       </div>
 
-      <Tabs defaultValue="talk" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 mb-8">
-          <TabsTrigger value="talk" className="flex flex-col items-center py-3 gap-1">
-            <MessageCircle className="h-5 w-5" />
-            <span className="text-xs">Talk</span>
-          </TabsTrigger>
-          <TabsTrigger value="journal" className="flex flex-col items-center py-3 gap-1">
-            <Brain className="h-5 w-5" />
-            <span className="text-xs">Journal</span>
-          </TabsTrigger>
-          <TabsTrigger value="mood" className="flex flex-col items-center py-3 gap-1">
-            <Activity className="h-5 w-5" />
-            <span className="text-xs">Mood</span>
-          </TabsTrigger>
-          <TabsTrigger value="progress" className="flex flex-col items-center py-3 gap-1">
-            <Calendar className="h-5 w-5" />
-            <span className="text-xs">Progress</span>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="talk" className="animate-fade-in">
-          <div className="grid grid-cols-1 gap-6">
-            <VoiceCompanion apiKey={apiKeys.elevenlabs} />
-            <MemoryChat apiKey={apiKeys.openai} />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="journal" className="animate-fade-in">
-          <JournalEntry apiKey={apiKeys.openai} />
-        </TabsContent>
-
-        <TabsContent value="mood" className="animate-fade-in">
-          <MoodTracker />
-        </TabsContent>
-
-        <TabsContent value="progress" className="animate-fade-in">
-          <div className="mental-card text-center py-12">
-            <h3 className="text-xl font-bold text-mentalPurple-700 mb-4">
-              Your Progress Report
-            </h3>
-            <p className="text-gray-600 mb-8">
-              Track your mental health journey and see your progress over time.
-            </p>
-            <div className="bg-mentalPurple-100 p-6 rounded-xl max-w-md mx-auto">
-              <p className="text-mentalPurple-700">
-                Keep using mindBFF daily to unlock your personalized reports and insights!
-              </p>
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+      <div className="grid grid-cols-1 gap-6">
+        <VoiceCompanion apiKey={apiKeys.elevenlabs} />
+        <MemoryChat apiKey={apiKeys.openai} />
+      </div>
     </Layout>
   );
 };
