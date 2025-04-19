@@ -77,11 +77,11 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
   const handleToggleListening = async () => {
     try {
       if (!apiKey) {
-        setError("Please set your ElevenLabs API key in settings");
+        setError("Please set your ElevenLabs Secret Key in settings");
         toast({
           variant: "destructive",
-          title: "Missing API Key",
-          description: "ElevenLabs API key is required for voice features",
+          title: "Missing Secret Key",
+          description: "ElevenLabs Secret Key is required for voice features",
         });
         return;
       }
@@ -90,12 +90,13 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
         // Request microphone access
         await navigator.mediaDevices.getUserMedia({ audio: true });
         
-        console.log("Starting conversation with ElevenLabs");
+        console.log("Starting conversation with ElevenLabs", apiKey);
         
         // Initialize session with the correct agent ID and authentication
+        // For ElevenLabs, we use the secret key directly without Bearer prefix
         await conversation.startSession({ 
           agentId: "IpGxDXMq7Zdd28TdsFMg", // Mental Health BFF agent ID
-          authorization: `Bearer ${apiKey}`, // Use the API key as a Bearer token
+          authorization: apiKey, // Use the secret key directly without Bearer prefix
         });
         
         setIsListening(true);
@@ -150,6 +151,7 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
             variant="ghost"
             size="icon"
             className={`w-24 h-24 rounded-full cursor-pointer ${isListening ? 'bg-mentalPurple-500 text-white hover:bg-mentalPurple-600' : 'bg-white text-mentalPurple-500 hover:bg-gray-100'}`}
+            type="button"
           >
             {isListening ? <MicOff className="h-10 w-10" /> : <Mic className="h-10 w-10" />}
           </Button>

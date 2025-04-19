@@ -79,7 +79,7 @@ export function ApiKeyInput({ onSaveKeys, initialKeys }: ApiKeyInputProps) {
             <Input
               id="elevenlabs-key"
               type="password"
-              placeholder="..."
+              placeholder="Enter your secret key here"
               value={elevenlabsKey}
               onChange={(e) => setElevenlabsKey(e.target.value)}
               className="mental-input"
