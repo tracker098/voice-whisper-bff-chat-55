@@ -85,7 +85,7 @@ export function ApiKeyInput({ onSaveKeys, initialKeys }: ApiKeyInputProps) {
               className="mental-input"
             />
             <p className="text-xs text-gray-500">
-              Used for the voice companion feature.
+              Used for the Mental Health BFF voice companion (Agent ID: IpGxDXMq7Zdd28TdsFMg).
             </p>
           </div>
         </div>

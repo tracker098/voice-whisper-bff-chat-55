@@ -92,14 +92,11 @@ export function VoiceCompanion({ apiKey }: VoiceCompanionProps) {
         
         console.log("Starting conversation with ElevenLabs");
         
-        // Initialize session with key using authorization instead of apiKey
+        // Initialize session with the correct agent ID and authentication
         await conversation.startSession({ 
-          agentId: "default",
+          agentId: "IpGxDXMq7Zdd28TdsFMg", // Use the provided agent ID
           authorization: `Bearer ${apiKey}`, // Use authorization instead of apiKey
-          connectionConfig: {
-            // To avoid CORS issues, use ElevenLabs API directly
-            wsUrl: "wss://api.elevenlabs.io/v1/convai/websocket",
-          }
+          wsUrl: "wss://api.elevenlabs.io/v1/convai/websocket", // Direct WebSocket URL
         });
         
         setIsListening(true);
